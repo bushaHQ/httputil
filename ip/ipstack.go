@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/bushaHQ/httputil/request"
+	"github.com/mitchellh/mapstructure"
 	"net/url"
 )
 
@@ -17,32 +18,32 @@ var (
 
 // IPInfo wraps json response
 type IPInfo struct {
-	IP            string  `json:"ip,omitempty"`
-	Type          string  `json:"type,omitempty"`
-	ContinentCode string  `json:"continent_code,omitempty"`
-	ContinentName string  `json:"continent_name,omitempty"`
-	CountryCode   string  `json:"country_code,omitempty"`
-	CountryName   string  `json:"country_name,omitempty"`
-	RegionCode    string  `json:"region_code,omitempty"`
-	RegionName    string  `json:"region_name,omitempty"`
-	City          string  `json:"city,omitempty"`
-	Zip           string  `json:"zip,omitempty"`
-	Latitude      float64 `json:"latitude,omitempty"`
-	Longitude     float64 `json:"longitude,omitempty"`
+	IP            string  `mapstructure:"ip,omitempty"`
+	Type          string  `mapstructure:"type,omitempty"`
+	ContinentCode string  `mapstructure:"continent_code,omitempty"`
+	ContinentName string  `mapstructure:"continent_name,omitempty"`
+	CountryCode   string  `mapstructure:"country_code,omitempty"`
+	CountryName   string  `mapstructure:"country_name,omitempty"`
+	RegionCode    string  `mapstructure:"region_code,omitempty"`
+	RegionName    string  `mapstructure:"region_name,omitempty"`
+	City          string  `mapstructure:"city,omitempty"`
+	Zip           string  `mapstructure:"zip,omitempty"`
+	Latitude      float64 `mapstructure:"latitude,omitempty"`
+	Longitude     float64 `mapstructure:"longitude,omitempty"`
 	Location      struct {
-		GeonameID float64 `json:"geoname_id,omitempty"`
-		Capital   string  `json:"capital,omitempty"`
+		GeonameID float64 `mapstructure:"geoname_id,omitempty"`
+		Capital   string  `mapstructure:"capital,omitempty"`
 		Languages []struct {
-			Code   string `json:"code,omitempty"`
-			Name   string `json:"name,omitempty"`
-			Native string `json:"native,omitempty"`
-		} `json:"languages,omitempty"`
-		CountryFlag             string `json:"country_flag,omitempty"`
-		CountryFlagEmoji        string `json:"country_flag_emoji,omitempty"`
-		CountryFlagEmojiUnicode string `json:"country_flag_emoji_unicode,omitempty"`
-		CallingCode             string `json:"calling_code,omitempty"`
-		IsEu                    bool   `json:"is_eu,omitempty"`
-	} `json:"location,omitempty"`
+			Code   string `mapstructure:"code,omitempty"`
+			Name   string `mapstructure:"name,omitempty"`
+			Native string `mapstructure:"native,omitempty"`
+		} `mapstructure:"languages,omitempty"`
+		CountryFlag             string `mapstructure:"country_flag,omitempty"`
+		CountryFlagEmoji        string `mapstructure:"country_flag_emoji,omitempty"`
+		CountryFlagEmojiUnicode string `mapstructure:"country_flag_emoji_unicode,omitempty"`
+		CallingCode             string `mapstructure:"calling_code,omitempty"`
+		IsEu                    bool   `mapstructure:"is_eu,omitempty"`
+	} `mapstructure:"location,omitempty"`
 }
 
 //sets the ipstack key for
@@ -83,12 +84,24 @@ func getInfo(path string) (*IPInfo, error) {
 	if err != nil {
 		return &IPInfo{}, err
 	}
+	//log.Println(string(res.Body))
+	m := map[string]interface{}{}
 
 	var ipInfo IPInfo
-	err = json.Unmarshal(res.Body, &ipInfo)
+	err = json.Unmarshal(res.Body, &m)
 	if err != nil {
 		return nil, err
 	}
 
-	return &ipInfo, nil
+	if s, ok := m["success"]; ok {
+		v, ok := s.(bool)
+		if !ok || !v {
+			return &IPInfo{}, fmt.Errorf("%s", m["error"].(map[string]interface{})["info"])
+		}
+
+	}
+
+	err = mapstructure.Decode(m, &ipInfo)
+
+	return &ipInfo, err
 }
