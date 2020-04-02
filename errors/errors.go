@@ -115,11 +115,11 @@ func ErrWithCustomText(err error, statusText string, statusCode int) *ErrRespons
 
 var (
 	// ErrBadRequest returns status 400 Bad Request for malformed request body.
-	ErrBadRequest = &ErrResponse{HTTPStatusCode: http.StatusBadRequest, StatusText: http.StatusText(http.StatusBadRequest)}
+	ErrBadRequest = New(http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 
 	// ErrNotFound returns status 404 Not Found for invalid resource request.
-	ErrNotFound = &ErrResponse{HTTPStatusCode: http.StatusNotFound, StatusText: http.StatusText(http.StatusNotFound)}
+	ErrNotFound = New(http.StatusText(http.StatusNotFound), http.StatusNotFound)
 
 	// ErrInternalServerError returns status 500 Internal Server Error.
-	ErrInternalServerError = &ErrResponse{HTTPStatusCode: http.StatusInternalServerError, StatusText: http.StatusText(http.StatusInternalServerError)}
+	ErrInternalServerError = New(http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
 )
