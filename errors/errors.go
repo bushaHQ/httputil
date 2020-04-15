@@ -47,6 +47,10 @@ func New(errText string, statusCode ...int) *ErrResponse {
 //defaultTo if otherwise. The value ErrResponse tells us that the error was handled
 //and  should not notify sentry
 func CoverErr(err, defaultTo error, logger errLogger) error {
+	if err == nil {
+		return nil
+	}
+
 	if _, ok := err.(*ErrResponse); ok {
 		return err
 	}
