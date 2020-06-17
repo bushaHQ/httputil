@@ -9,19 +9,20 @@ import (
 
 // The list of error types presented to the end user as error message.
 var (
-	ErrInvalidLogin        = errors.New("invalid email address")
-	ErrEmailExists         = errors.New("email address is already registered")
-	ErrUnknownLogin        = errors.New("email not registered")
-	ErrLoginDisabled       = errors.New("login for account disabled")
-	ErrLoginToken          = errors.New("invalid or expired login token")
-	ErrInvalidPassword     = errors.New("invalid password")
-	ErrInvalidMFACode      = errors.New("invalid MFA code")
-	ErrFailedCaptcha       = errors.New("Invalid captcha response")
-	ErrNoMFACode           = errors.New("enter MFA code")
-	ErrInsufficientFund    = errors.New("insufficient funds")
-	ErrIncompleteParams    = errors.New("incomplete parameters")
-	ErrServiceNotSupported = errors.New("service not supported")
-	ErrServiceUnavailable  = errors.New("service unavailable")
+	ErrInvalidLogin        = New("invalid email address", http.StatusUnauthorized)
+	ErrEmailExists         = New("email address is already registered")
+	ErrUnknownLogin        = New("email not registered")
+	ErrLoginDisabled       = New("login for account disabled", http.StatusUnauthorized)
+	ErrLoginToken          = New("invalid or expired login token")
+	ErrInvalidPassword     = New("invalid password", http.StatusUnauthorized)
+	ErrInvalidMFACode      = New("invalid MFA code", http.StatusUnauthorized)
+	ErrMobileToken         = New("Device time out of sync. Go to Settings > Date and Time > Turn the 'Automatic date and time' off, then  back on again")
+	ErrFailedCaptcha       = New("Invalid captcha response")
+	ErrNoMFACode           = New("enter MFA code")
+	ErrInsufficientFund    = New("insufficient funds")
+	ErrIncompleteParams    = New("incomplete parameters")
+	ErrServiceNotSupported = New("service not supported", http.StatusServiceUnavailable)
+	ErrServiceUnavailable  = New("service unavailable", http.StatusServiceUnavailable)
 )
 
 type errLogger interface {
