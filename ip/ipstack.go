@@ -70,7 +70,7 @@ func ForeignIP(ip string) (*IPInfo, error) {
 func getInfo(path string) (*IPInfo, error) {
 	u, err := url.Parse(ipstackURI)
 	if err != nil {
-		return &IPInfo{}, err
+		return nil, err
 	}
 	req := request.Req{
 		BaseURL: u,
@@ -82,7 +82,7 @@ func getInfo(path string) (*IPInfo, error) {
 
 	res, err := request.Do(req)
 	if err != nil {
-		return &IPInfo{}, err
+		return nil, err
 	}
 	//log.Println(string(res.Body))
 	m := map[string]interface{}{}
@@ -96,7 +96,7 @@ func getInfo(path string) (*IPInfo, error) {
 	if s, ok := m["success"]; ok {
 		v, ok := s.(bool)
 		if !ok || !v {
-			return &IPInfo{}, fmt.Errorf("%s", m["error"].(map[string]interface{})["info"])
+			return nil, fmt.Errorf("%s", m["error"].(map[string]interface{})["info"])
 		}
 
 	}
